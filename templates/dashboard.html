@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %} | Dashboard {% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+  {% if posts %}
+  {% for post in posts %}
+  <div class="card mb-4 shadow-sm">
+    
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2 class="mb-0">@{{ post.author.name }}</h2>
+      {% if session['user_id'] == post.user_id %}
+      <div class="dropdown text-end">
+        <button class="btn btn-dark" type="button" id="dropdownMenuButton{{ post.id }}" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Post options">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
+        <ul class="dropdown-menu bg-dark dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ post.id }}">
+          <li><a class="dropdown-item text-white" href="/update/{{ post.id }}">Edit</a></li>
+          <li><a class="dropdown-item text-danger" href="/delete/{{ post.id }}" onclick="return confirm('Are you sure you want to delete this post?');">Delete</a></li>
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if post.photo %}
+    <div class="card-body">
+      <img class="img-fluid" src="data:image/png;base64,{{ post.photo }}" alt="Post photo">
+    </div>
+    {% endif %}
+
+    <div class="card-footer">
+      <div class="d-flex">
+        <a class="nav-link fs-3 ms-3" href="/like/{{ post.id }}"><i class="bi bi-heart-fill text-danger"></i> <span>{{ post.likes|length }}</span></a>
+        <a class="nav-link fs-3"><i class="bi bi-chat-dots" onclick="showComment({{post.id}})"></i> {{ post.comments|length }}</a>
+      </div>
+      <p><img style="height: 30px; width: 30px; border-radius: 50%;" src="data:image/png;base64,{{ post.author.profile_photo }}"> {{ post.content }}</p>
+      <div id="box-{{post.id}}" style="display: none;">
+        <h5>Comments:</h5>
+        <ul class="list-group mb-3">
+          {% for comment in post.comments %}
+          <li class="list-group-item">
+            <img style="width: 20px; width: 20px; border-radius: 50%;" src="data:image/png;base64, {{ comment.user.profile_photo }}"> <strong>{{ comment.username }}:</strong> {{ comment.content }}
+          </li>
+          {% else %}
+          <li class="list-group-item text-muted">No comments yet.</li>
+          {% endfor %}
+        </ul>
+
+        {% if session['user_id'] %}
+        <form action="/comment/{{ post.id }}" method="post" class="d-flex gap-2">
+          <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add a comment..." required>
+          <button type="submit" class="btn btn-primary btn-sm">Comment</button>
+        </form>
+        {% else %}
+        <p><a href="/login">Log in</a> to comment.</p>
+        {% endif %}
+      </div>
+      
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p>No posts yet.</p>
+  {% endif %}
+</div>
+
+<script>
+function showComment(id) {
+  const box = document.getElementById(`box-${id}`);
+  if (box.style.display === "none") {
+    box.style.display = "block";
+  } else {
+    box.style.display = "none";
+  }
+}
+</script>
+{% endblock content %}

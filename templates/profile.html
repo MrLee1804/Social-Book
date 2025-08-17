@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %} | Profile {% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+  <!-- Profile Header -->
+  <div class="row align-items-center mb-4">
+    <div class="col-auto">
+      <img
+        src="data:image/png;base64,{{ user.profile_photo }}"
+        alt="Profile Photo"
+        class="rounded-circle shadow-sm"
+        style="height: 100px; width: 100px; object-fit: cover;"
+      >
+    </div>
+    <div class="col">
+      <h2 class="mb-1">{{ user.name }}</h2>
+      <p>Posts ({{ user.posts|length }})</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Posts Grid Nx3 -->
+  {% if user.posts %}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+    {% for post in user.posts %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        {% if post.photo %}
+        <img
+          src="data:image/png;base64,{{ post.photo }}"
+          alt="Post Photo"
+          class="card-img-top"
+          style="height: 200px; object-fit: cover;"
+        >
+        {% endif %}
+        <div class="card-body">
+          <p class="card-text">{{ post.content }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-secondary text-center mt-4">
+    No posts available.
+  </div>
+  {% endif %}
+</div>
+{% endblock content %}
